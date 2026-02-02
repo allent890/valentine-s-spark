@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import CuteFox from "./CuteFox";
@@ -9,6 +9,7 @@ const ValentineCard = () => {
   const [yesScale, setYesScale] = useState(1);
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
   const [attempts, setAttempts] = useState(0);
+  const [isWandering, setIsWandering] = useState(false);
   const zoneRef = useRef<HTMLDivElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -75,12 +76,9 @@ const ValentineCard = () => {
 
   const moveNoButton = useCallback(
     (pointerX: number, pointerY: number) => {
-      if (!zoneRef.current || !noButtonRef.current) return;
+      if (!noButtonRef.current) return;
 
-      const zone = zoneRef.current.getBoundingClientRect();
       const btn = noButtonRef.current.getBoundingClientRect();
-
-      // Calculate direction away from pointer
       const btnCenterX = btn.left + btn.width / 2;
       const btnCenterY = btn.top + btn.height / 2;
 
@@ -90,23 +88,51 @@ const ValentineCard = () => {
       dx /= mag;
       dy /= mag;
 
-      // Move button away
-      const moveDistance = 100 + Math.random() * 50;
-      let newX = noPosition.x + dx * moveDistance;
-      let newY = noPosition.y + dy * moveDistance;
+      const newAttempts = Math.min(noMessages.length - 1, attempts + 1);
+      const shouldWander = newAttempts >= noMessages.length - 1;
 
-      // Clamp to zone bounds
-      const maxX = zone.width / 2 - btn.width / 2 - 10;
-      const maxY = zone.height / 2 - btn.height / 2 - 10;
+      if (shouldWander && !isWandering) {
+        setIsWandering(true);
+      }
 
-      newX = Math.max(-maxX, Math.min(maxX, newX));
-      newY = Math.max(-maxY, Math.min(maxY, newY));
+      if (shouldWander || isWandering) {
+        // Wander all over the screen
+        const moveDistance = 150 + Math.random() * 100;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Calculate new position relative to screen center
+        let newX = noPosition.x + dx * moveDistance;
+        let newY = noPosition.y + dy * moveDistance;
 
-      setNoPosition({ x: newX, y: newY });
+        // Clamp to screen bounds with padding
+        const maxX = screenWidth / 2 - btn.width / 2 - 20;
+        const maxY = screenHeight / 2 - btn.height / 2 - 20;
+
+        newX = Math.max(-maxX, Math.min(maxX, newX));
+        newY = Math.max(-maxY, Math.min(maxY, newY));
+
+        setNoPosition({ x: newX, y: newY });
+      } else if (zoneRef.current) {
+        // Stay within zone
+        const zone = zoneRef.current.getBoundingClientRect();
+        const moveDistance = 100 + Math.random() * 50;
+        let newX = noPosition.x + dx * moveDistance;
+        let newY = noPosition.y + dy * moveDistance;
+
+        const maxX = zone.width / 2 - btn.width / 2 - 10;
+        const maxY = zone.height / 2 - btn.height / 2 - 10;
+
+        newX = Math.max(-maxX, Math.min(maxX, newX));
+        newY = Math.max(-maxY, Math.min(maxY, newY));
+
+        setNoPosition({ x: newX, y: newY });
+      }
+
       setYesScale((prev) => Math.min(2, prev + 0.08));
-      setAttempts((prev) => Math.min(noMessages.length - 1, prev + 1));
+      setAttempts(newAttempts);
     },
-    [noPosition, noMessages.length]
+    [noPosition, noMessages.length, attempts, isWandering]
   );
 
   const handlePointerMove = useCallback(
@@ -125,6 +151,28 @@ const ValentineCard = () => {
     },
     [moveNoButton]
   );
+
+  // Global pointer move handler for when button is wandering
+  useEffect(() => {
+    if (!isWandering) return;
+
+    const handleGlobalPointerMove = (e: PointerEvent) => {
+      if (!noButtonRef.current) return;
+
+      const btn = noButtonRef.current.getBoundingClientRect();
+      const distance = Math.hypot(
+        btn.left + btn.width / 2 - e.clientX,
+        btn.top + btn.height / 2 - e.clientY
+      );
+
+      if (distance < 120) {
+        moveNoButton(e.clientX, e.clientY);
+      }
+    };
+
+    window.addEventListener("pointermove", handleGlobalPointerMove);
+    return () => window.removeEventListener("pointermove", handleGlobalPointerMove);
+  }, [isWandering, moveNoButton]);
 
   return (
     <motion.div
@@ -175,28 +223,55 @@ const ValentineCard = () => {
                   </Button>
                 </motion.div>
 
-                {/* No Button */}
+                {/* No Button - renders in zone or fixed to screen */}
+                {!isWandering && (
+                  <motion.div
+                    className="absolute left-3/4 top-1/2"
+                    animate={{
+                      x: noPosition.x - 50 + "%",
+                      y: noPosition.y - 50 + "%",
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  >
+                    <Button
+                      ref={noButtonRef}
+                      variant="secondary"
+                      className="font-semibold text-base md:text-lg px-6 py-5 rounded-full transition-all duration-200 hover:bg-secondary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        moveNoButton(e.clientX, e.clientY);
+                      }}
+                    >
+                      {noMessages[attempts]}
+                    </Button>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Wandering No Button - fixed position on screen */}
+              {isWandering && !accepted && (
                 <motion.div
-                  className="absolute left-3/4 top-1/2"
+                  className="fixed left-1/2 top-1/2 z-50"
                   animate={{
-                    x: noPosition.x - 50 + "%",
-                    y: noPosition.y - 50 + "%",
+                    x: noPosition.x,
+                    y: noPosition.y,
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  style={{ translateX: "-50%", translateY: "-50%" }}
                 >
                   <Button
                     ref={noButtonRef}
                     variant="secondary"
-                    className="font-semibold text-base md:text-lg px-6 py-5 rounded-full transition-all duration-200 hover:bg-secondary"
+                    className="font-semibold text-base md:text-lg px-6 py-5 rounded-full transition-all duration-200 hover:bg-secondary animate-wiggle shadow-lg"
                     onClick={(e) => {
                       e.preventDefault();
                       moveNoButton(e.clientX, e.clientY);
                     }}
                   >
-                    {noMessages[attempts]}
+                    {noMessages[attempts]} 🏃
                   </Button>
                 </motion.div>
-              </div>
+              )}
 
               <motion.p
                 className="text-center text-muted-foreground text-sm mt-4"
