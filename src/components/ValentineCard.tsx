@@ -10,8 +10,12 @@ const ValentineCard = () => {
   const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
   const [attempts, setAttempts] = useState(0);
   const [isWandering, setIsWandering] = useState(false);
+  const [wanderCount, setWanderCount] = useState(0);
+  const [yesTookOver, setYesTookOver] = useState(false);
   const zoneRef = useRef<HTMLDivElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
+
+  const WANDER_LIMIT = 8; // After 8 escapes while wandering, Yes takes over
 
   const noMessages = [
     "No",
@@ -96,6 +100,16 @@ const ValentineCard = () => {
       }
 
       if (shouldWander || isWandering) {
+        // Track wandering escapes
+        const newWanderCount = wanderCount + 1;
+        setWanderCount(newWanderCount);
+
+        // Check if Yes should take over the screen
+        if (newWanderCount >= WANDER_LIMIT) {
+          setYesTookOver(true);
+          return;
+        }
+
         // Wander all over the screen
         const moveDistance = 150 + Math.random() * 100;
         const screenWidth = window.innerWidth;
@@ -132,7 +146,7 @@ const ValentineCard = () => {
       setYesScale((prev) => Math.min(2, prev + 0.08));
       setAttempts(newAttempts);
     },
-    [noPosition, noMessages.length, attempts, isWandering]
+    [noPosition, noMessages.length, attempts, isWandering, wanderCount, WANDER_LIMIT]
   );
 
   const handlePointerMove = useCallback(
@@ -175,7 +189,52 @@ const ValentineCard = () => {
   }, [isWandering, moveNoButton]);
 
   return (
-    <motion.div
+    <>
+      {/* Fullscreen Yes Takeover */}
+      <AnimatePresence>
+        {yesTookOver && !accepted && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-gradient-to-br from-primary/95 via-accent/90 to-primary/95 cursor-pointer"
+            initial={{ scale: 0, borderRadius: "50%" }}
+            animate={{ scale: 1, borderRadius: "0%" }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            onClick={handleYesClick}
+          >
+            <motion.div
+              className="text-center text-primary-foreground"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+            >
+              <motion.p
+                className="text-2xl md:text-4xl font-bold mb-4"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                You can't escape! 💕
+              </motion.p>
+              <motion.div
+                className="text-6xl md:text-9xl font-romantic"
+                animate={{ scale: [1, 1.1, 1], rotate: [0, 3, -3, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                YES! 💖
+              </motion.div>
+              <motion.p
+                className="text-xl md:text-2xl mt-6 opacity-90"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                (tap anywhere to accept your fate)
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
       className="relative z-10 w-full max-w-lg mx-auto p-6 md:p-10"
       initial={{ y: 50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -319,6 +378,7 @@ const ValentineCard = () => {
         </AnimatePresence>
       </div>
     </motion.div>
+    </>
   );
 };
 
