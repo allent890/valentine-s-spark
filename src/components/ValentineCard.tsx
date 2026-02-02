@@ -149,7 +149,7 @@ const ValentineCard = () => {
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                Nirali
+                Malu
               </motion.h1>
               <h2 className="text-xl md:text-2xl text-center font-semibold text-foreground mb-8">
                 Will you be my Valentine? 💕
