@@ -30,7 +30,7 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
     let empty = TILE_COUNT - 1;
 
     // Perform random valid moves to shuffle (ensures solvability)
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 30; i++) {
       const neighbors = getNeighbors(empty);
       const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
       [arr[empty], arr[randomNeighbor]] = [arr[randomNeighbor], arr[empty]];
@@ -63,11 +63,11 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
       const newTiles = [...prev];
       [newTiles[emptyIndex], newTiles[clickedIndex]] = [newTiles[clickedIndex], newTiles[emptyIndex]];
       
-      // Check if solved
+      // Check if solved (all tiles in order 0,1,2,3...)
       const solved = newTiles.every((tile, idx) => tile === idx);
       if (solved) {
         setIsSolved(true);
-        setTimeout(onComplete, 1500);
+        setTimeout(onComplete, 2000);
       }
       
       return newTiles;
@@ -76,17 +76,20 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
     setMoves(m => m + 1);
   }, [emptyIndex, isSolved, onComplete]);
 
-  const getTileStyle = (tileValue: number) => {
-    if (tileValue === TILE_COUNT - 1) return {}; // Empty tile
+  const getTileStyle = (tileValue: number, isEmptyTile: boolean) => {
+    // When solved, show all tiles including the "empty" one
+    if (isSolved || !isEmptyTile) {
+      const originalRow = Math.floor(tileValue / GRID_SIZE);
+      const originalCol = tileValue % GRID_SIZE;
+      
+      return {
+        backgroundImage: `url(${couplePhoto})`,
+        backgroundSize: `${GRID_SIZE * 100}% ${GRID_SIZE * 100}%`,
+        backgroundPosition: `${(originalCol / (GRID_SIZE - 1)) * 100}% ${(originalRow / (GRID_SIZE - 1)) * 100}%`,
+      };
+    }
     
-    const originalRow = Math.floor(tileValue / GRID_SIZE);
-    const originalCol = tileValue % GRID_SIZE;
-    
-    return {
-      backgroundImage: `url(${couplePhoto})`,
-      backgroundSize: `${GRID_SIZE * 100}% ${GRID_SIZE * 100}%`,
-      backgroundPosition: `${(originalCol / (GRID_SIZE - 1)) * 100}% ${(originalRow / (GRID_SIZE - 1)) * 100}%`,
-    };
+    return {}; // Empty tile when not solved
   };
 
   return (
@@ -118,41 +121,50 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
             className="grid gap-1 mx-auto aspect-square max-w-[300px] rounded-xl overflow-hidden bg-secondary/50 p-1"
             style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)` }}
           >
-            {tiles.map((tileValue, index) => (
-              <motion.button
-                key={index}
-                className={`aspect-square rounded-lg cursor-pointer transition-all ${
-                  tileValue === TILE_COUNT - 1 
-                    ? "bg-secondary/30" 
-                    : "shadow-md hover:shadow-lg border-2 border-white/20"
-                }`}
-                style={getTileStyle(tileValue)}
-                onClick={() => handleTileClick(index)}
-                whileHover={tileValue !== TILE_COUNT - 1 ? { scale: 1.02 } : {}}
-                whileTap={tileValue !== TILE_COUNT - 1 ? { scale: 0.98 } : {}}
-                layout
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            ))}
+            {tiles.map((tileValue, index) => {
+              const isEmptyTile = tileValue === TILE_COUNT - 1;
+              return (
+                <motion.button
+                  key={index}
+                  className={`aspect-square rounded-lg cursor-pointer transition-all ${
+                    isEmptyTile && !isSolved
+                      ? "bg-secondary/30" 
+                      : "shadow-md hover:shadow-lg border-2 border-white/20"
+                  }`}
+                  style={getTileStyle(tileValue, isEmptyTile)}
+                  onClick={() => handleTileClick(index)}
+                  whileHover={!isEmptyTile || isSolved ? { scale: 1.02 } : {}}
+                  whileTap={!isEmptyTile || isSolved ? { scale: 0.98 } : {}}
+                  layout
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              );
+            })}
           </div>
 
           {/* Solved Overlay */}
           {isSolved && (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center bg-primary/80 rounded-xl"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              className="absolute inset-0 flex items-center justify-center rounded-xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
             >
-              <div className="text-center text-primary-foreground">
+              <motion.div
+                className="bg-primary/90 px-6 py-4 rounded-2xl text-center text-primary-foreground"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.5 }}
+              >
                 <motion.div
-                  className="text-5xl mb-2"
+                  className="text-4xl mb-2"
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
                   transition={{ duration: 0.5 }}
                 >
                   🎉
                 </motion.div>
                 <p className="font-bold text-xl">Perfect!</p>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </div>
