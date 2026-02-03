@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import CuteFox from "./CuteFox";
+import RedEnvelope from "./RedEnvelope";
 import { Button } from "@/components/ui/button";
 
 const ValentineCard = () => {
@@ -373,6 +374,9 @@ const ValentineCard = () => {
               <p className="text-muted-foreground mt-6 text-lg">
                 I can't wait to spend Valentine's Day with you! ✨
               </p>
+              
+              {/* Red Envelope with Letter */}
+              <RedEnvelope letterContent="Your special message will go here..." />
             </motion.div>
           )}
         </AnimatePresence>
