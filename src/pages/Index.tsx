@@ -1,13 +1,7 @@
-import FloatingHearts from "@/components/FloatingHearts";
-import ValentineCard from "@/components/ValentineCard";
+import GameFlow from "@/components/GameFlow";
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4 overflow-hidden">
-      <FloatingHearts />
-      <ValentineCard />
-    </div>
-  );
+  return <GameFlow />;
 };
 
 export default Index;
