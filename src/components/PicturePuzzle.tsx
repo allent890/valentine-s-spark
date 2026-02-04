@@ -7,7 +7,7 @@ interface PicturePuzzleProps {
   onComplete: () => void;
 }
 
-const GRID_SIZE = 2;
+const GRID_SIZE = 3;
 const TILE_COUNT = GRID_SIZE * GRID_SIZE;
 
 const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
