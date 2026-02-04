@@ -376,7 +376,11 @@ const ValentineCard = () => {
               </p>
               
               {/* Red Envelope with Letter */}
-              <RedEnvelope letterContent="Your special message will go here..." />
+              <RedEnvelope letterContent={`Thank you for making me your valentine for the 6th year babyyy!! Wow 6 years and we still choose each other every time lol. I pray and hope that I can keep making you my valentine for the rest of our lives as I've got the BEST one (ik you'll be saying "yaa right" in ur head but that's the truth!!).
+
+A lot of changes happen in my life but you and your love are that one constant thing that I've always had and never want to lose! Thank you for being you and always loving me even when sometimes I make it impossible and everything else that I might not say in the moment but just know that I appreciate you more than anything!
+
+I hope in these coming years I will be able to call you my valentine and my wife. I love you my forever valentine! ❤️`} />
             </motion.div>
           )}
         </AnimatePresence>
