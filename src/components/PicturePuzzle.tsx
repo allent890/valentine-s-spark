@@ -76,6 +76,15 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
     setMoves(m => m + 1);
   }, [emptyIndex, isSolved, onComplete]);
 
+  const handleAutoSolve = () => {
+    // Set tiles to solved state
+    const solvedTiles = Array.from({ length: TILE_COUNT }, (_, i) => i);
+    setTiles(solvedTiles);
+    setEmptyIndex(TILE_COUNT - 1);
+    setIsSolved(true);
+    setTimeout(onComplete, 2000);
+  };
+
   const getTileStyle = (tileValue: number, isEmptyTile: boolean) => {
     // When solved, show all tiles including the "empty" one
     if (isSolved || !isEmptyTile) {
@@ -173,13 +182,23 @@ const PicturePuzzle = ({ onComplete }: PicturePuzzleProps) => {
           <span className="text-sm text-muted-foreground">
             Moves: <span className="font-semibold text-foreground">{moves}</span>
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowHint(!showHint)}
-          >
-            {showHint ? "Hide Hint" : "Show Hint"} 💡
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHint(!showHint)}
+            >
+              {showHint ? "Hide Hint" : "Show Hint"} 💡
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleAutoSolve}
+              disabled={isSolved}
+            >
+              Auto-solve ✨
+            </Button>
+          </div>
         </div>
 
         {/* Hint Image */}
