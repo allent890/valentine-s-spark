@@ -242,7 +242,14 @@ const ValentineCard = () => {
       transition={{ duration: 0.8, ease: "backOut" }}
     >
       <div className="bg-card/90 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-card border border-white/50">
-        <CuteFox />
+        <CuteFox mood={
+          accepted ? "happy" :
+          attempts === 0 ? "happy" :
+          attempts <= 3 ? "sad" :
+          attempts <= 7 ? "teary" :
+          attempts <= 11 ? "angry" :
+          "pleading"
+        } />
 
         <AnimatePresence mode="wait">
           {!accepted ? (
