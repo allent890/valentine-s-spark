@@ -80,7 +80,7 @@ const ValentineCard = () => {
   };
 
   const moveNoButton = useCallback(
-    (pointerX: number, pointerY: number) => {
+    (pointerX: number, pointerY: number, isTouch: boolean = false) => {
       if (!noButtonRef.current) return;
 
       const btn = noButtonRef.current.getBoundingClientRect();
@@ -93,12 +93,24 @@ const ValentineCard = () => {
       dx /= mag;
       dy /= mag;
 
+      // Add randomness to direction for more unpredictable movement
+      const randomAngle = (Math.random() - 0.5) * Math.PI / 2;
+      const cos = Math.cos(randomAngle);
+      const sin = Math.sin(randomAngle);
+      const newDx = dx * cos - dy * sin;
+      const newDy = dx * sin + dy * cos;
+      dx = newDx;
+      dy = newDy;
+
       const newAttempts = Math.min(noMessages.length - 1, attempts + 1);
       const shouldWander = newAttempts >= noMessages.length - 1;
 
       if (shouldWander && !isWandering) {
         setIsWandering(true);
       }
+
+      // Use larger move distances for touch/mobile to make it more responsive
+      const touchMultiplier = isTouch ? 1.5 : 1;
 
       if (shouldWander || isWandering) {
         // Track wandering escapes
@@ -112,7 +124,7 @@ const ValentineCard = () => {
         }
 
         // Wander all over the screen
-        const moveDistance = 150 + Math.random() * 100;
+        const moveDistance = (150 + Math.random() * 100) * touchMultiplier;
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
         
@@ -129,9 +141,9 @@ const ValentineCard = () => {
 
         setNoPosition({ x: newX, y: newY });
       } else if (zoneRef.current) {
-        // Stay within zone
+        // Stay within zone - use much larger distances for touch
         const zone = zoneRef.current.getBoundingClientRect();
-        const moveDistance = 100 + Math.random() * 50;
+        const moveDistance = (100 + Math.random() * 80) * touchMultiplier;
         let newX = noPosition.x + dx * moveDistance;
         let newY = noPosition.y + dy * moveDistance;
 
@@ -306,7 +318,7 @@ const ValentineCard = () => {
                       className="font-semibold text-base md:text-lg px-6 py-5 rounded-full transition-all duration-200 hover:bg-secondary"
                       onClick={(e) => {
                         e.preventDefault();
-                        moveNoButton(e.clientX, e.clientY);
+                        moveNoButton(e.clientX, e.clientY, true);
                       }}
                     >
                       {noMessages[attempts]}
@@ -332,7 +344,7 @@ const ValentineCard = () => {
                     className="font-semibold text-base md:text-lg px-6 py-5 rounded-full transition-all duration-200 hover:bg-secondary animate-wiggle shadow-lg"
                     onClick={(e) => {
                       e.preventDefault();
-                      moveNoButton(e.clientX, e.clientY);
+                      moveNoButton(e.clientX, e.clientY, true);
                     }}
                   >
                     {noMessages[attempts]} 🏃

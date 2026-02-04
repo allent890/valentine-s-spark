@@ -40,7 +40,7 @@ const BackgroundMusic = () => {
 
   return (
     <>
-      <audio ref={audioRef} src="/audio/background-music.m4a" preload="auto" />
+      <audio ref={audioRef} src="/audio/background-music.mp3" preload="auto" />
       
       {/* Initial music prompt */}
       <AnimatePresence>
