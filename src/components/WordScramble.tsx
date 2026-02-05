@@ -6,7 +6,7 @@ interface WordScrambleProps {
   onComplete: () => void;
 }
 
-const TARGET_PHRASE = "WILL YOU BE MY VALENTINE";
+const TARGET_PHRASE = "STARBUCKS";
 
 const WordScramble = ({ onComplete }: WordScrambleProps) => {
   const [scrambledLetters, setScrambledLetters] = useState<string[]>([]);
@@ -91,7 +91,7 @@ const WordScramble = ({ onComplete }: WordScrambleProps) => {
 
         {/* Hint about format */}
         <p className="text-center text-sm text-muted-foreground mb-4">
-          Hint: It's a {TARGET_PHRASE.split(" ").length}-word question 💭
+          Hint: How I asked you to be my valentine for the first time 💭
         </p>
 
         {/* Input field */}
@@ -158,7 +158,7 @@ const WordScramble = ({ onComplete }: WordScrambleProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              💡 The answer is: "_ _ _ _   _ _ _   _ _   _ _   _ _ _ _ _ _ _ _ _"
+              💡 The answer is: "_ _ _ _ _ _ _ _ _"
             </motion.p>
           )}
         </div>
