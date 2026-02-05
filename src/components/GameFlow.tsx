@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import PicturePuzzle from "./PicturePuzzle";
 import WordScramble from "./WordScramble";
 import FloatingHearts from "./FloatingHearts";
+import FloatingPhotos from "./FloatingPhotos";
 import ValentineCard from "./ValentineCard";
 import BackgroundMusic from "./BackgroundMusic";
 
@@ -23,6 +24,7 @@ const GameFlow = () => {
     <div className="min-h-screen relative overflow-hidden">
       <BackgroundMusic />
       <FloatingHearts />
+      <FloatingPhotos />
       
       {/* Progress indicator */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex gap-2">
