@@ -407,6 +407,22 @@ const ValentineCard = () => {
 A lot of changes happen in my life but you and your love are that one constant thing that I've always had and never want to lose! Thank you for being you and always loving me even when sometimes I make it impossible and everything else that I might not say in the moment but just know that I appreciate you more than anything!
 
 I hope in these coming years I will be able to call you my valentine and my wife. I love you my forever valentine! ❤️`} />
+              
+              {/* Restart Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="mt-6"
+              >
+                <Button
+                  variant="secondary"
+                  onClick={() => window.location.reload()}
+                  className="font-semibold px-6 py-5 rounded-full"
+                >
+                  Enjoy your gifts now! Bye 👋
+                </Button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
