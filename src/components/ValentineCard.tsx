@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import CuteFox from "./CuteFox";
 import RedEnvelope from "./RedEnvelope";
-import FloatingPhotos from "./FloatingPhotos";
 import { Button } from "@/components/ui/button";
 const ValentineCard = () => {
   const [accepted, setAccepted] = useState(false);
@@ -214,7 +213,6 @@ const ValentineCard = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             onClick={handleYesClick}
           >
-            <FloatingPhotos />
             <motion.div
               className="text-center text-primary-foreground z-20"
               initial={{ opacity: 0, scale: 0.5 }}
