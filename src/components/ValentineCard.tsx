@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import CuteFox from "./CuteFox";
 import RedEnvelope from "./RedEnvelope";
+import FloatingPhotos from "./FloatingPhotos";
 import { Button } from "@/components/ui/button";
-
 const ValentineCard = () => {
   const [accepted, setAccepted] = useState(false);
   const [yesScale, setYesScale] = useState(1);
@@ -214,12 +214,21 @@ const ValentineCard = () => {
             transition={{ duration: 0.6, ease: "easeOut" }}
             onClick={handleYesClick}
           >
+            <FloatingPhotos />
             <motion.div
-              className="text-center text-primary-foreground"
+              className="text-center text-primary-foreground z-20"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.4 }}
             >
+              <motion.p
+                className="text-xl md:text-2xl font-semibold mb-2 opacity-90"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 0.9, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+              >
+                Okay thats it! 😤
+              </motion.p>
               <motion.p
                 className="text-2xl md:text-4xl font-bold mb-4"
                 animate={{ y: [0, -10, 0] }}
