@@ -24,7 +24,7 @@ const floatingPhotos = photos.map((src, i) => ({
 
 const FloatingPhotos = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-10">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {floatingPhotos.map((photo) => (
         <motion.div
           key={photo.id}
